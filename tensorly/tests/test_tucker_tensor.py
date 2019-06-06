@@ -16,7 +16,7 @@ def test_validate_tucker_tensor():
     true_shape = (3, 4, 5)
     true_rank = (3, 2, 4)
     core, factors = random_tucker(true_shape, rank=true_rank)
-    
+
     # Check shape and rank returned
     shape, rank = _validate_tucker_tensor((core, factors))
     assert_equal(shape, true_shape,
@@ -30,7 +30,7 @@ def test_validate_tucker_tensor():
     factors[0], copy = tl.tensor(rng.random_sample((4, 4))), factors[0]
     with assert_raises(ValueError):
         _validate_tucker_tensor((core, factors))
-    
+
     # Not enough factors to match core
     factors[0] = copy
     with assert_raises(ValueError):
