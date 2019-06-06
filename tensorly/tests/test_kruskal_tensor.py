@@ -187,7 +187,7 @@ def test_unfolding_dot_khatri_rao():
     Check against other version check sparse safe
     """
     shape = (10, 10, 10, 4)
-    rank = 5
+    rank = 6
     tensor = tl.tensor(np.random.random(shape))
     weights, factors = random_kruskal(shape=shape, rank=rank, 
                                       full=False, normalise_factors=True)
