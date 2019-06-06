@@ -16,6 +16,9 @@ matrix:
        env: BACKEND=tensorflow
      - os: linux
        python: 3.6
+       env: BACKEND=tensorflow_graph
+     - os: linux
+       python: 3.6
        env: BACKEND=numpy DEPLOY_DOCS=1
        addons:
          apt:
@@ -42,11 +45,12 @@ install:
     # For NumPy: install sparse for contrib.sparse tests
     # For MXNet, additionnal dependencies are required
     # For PyTorch, install the cpu version and torchvision
+    # for TensorFlow (eager)/TensorFlow (graph), install tensorflow
     - if [[ "$BACKEND" == "numpy" ]]; then
         pip install sparse;
       elif [[ "$BACKEND" == "pytorch" ]]; then
         conda install pytorch-cpu torchvision-cpu -c pytorch;
-      elif [[ "$BACKEND" == "tensorflow" ]]; then
+      elif [[ "$BACKEND" == "tensorflow" || "$BACKEND" == "tensorflow_graph" ]]; then
         conda install tensorflow;
       elif [[ "$BACKEND" == "mxnet" ]]; then
         sudo apt-get -qq update;
