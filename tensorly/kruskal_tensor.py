@@ -86,9 +86,15 @@ def _validate_kruskal_tensor(kruskal_tensor):
                                  rank, i, T.shape(factor)[1]))
         shape.append(current_mode_size)
 
-    if weights is not None and len(weights) != rank:
+    weight_len = T.shape(weights)[0]
+    if weight_len is None:
+        # TensorflowGraph backend only - placeholders will have unknown shapes
+        # at this place, warn the user that the Tensor cannot be validated
+        warnings.warn('weights has an unknown size at index 0 of its shape: '
+                      'cannot validate Kruskal tensor')
+    elif weights is not None and weight_len != rank:
         raise ValueError('Given factors for a rank-{} Kruskal tensor but len(weights)={}.'.format(
-            rank, len(weights)))
+            rank, weight_len))
         
     return tuple(shape), rank
 
