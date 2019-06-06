@@ -109,11 +109,11 @@ def robust_pca(X, mask=None, tol=10e-7, reg_E=1, reg_J=1,
 
         # Evolution of the reconstruction errors
         rec_X.append(T.norm(X - D - E, 2))
-        rec_D.append(np.max([T.norm(low_rank - D, 2) for low_rank in J]))
+        rec_D.append(T.max([T.norm(low_rank - D, 2) for low_rank in J]))
 
         # Convergence check
         if iteration > 1:
-            if (max(rec_X[-1], rec_D[-1]) <= tol):
+            if T.max([rec_X[-1], rec_D[-1]]) <= tol:
                 if verbose:
                     print('\nConverged in {} iterations'.format(iteration))
                 break
