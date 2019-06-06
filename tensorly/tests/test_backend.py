@@ -5,14 +5,13 @@ import numpy as np
 from scipy.linalg import svd
 
 import tensorly as tl
-from ..backend import numpy_backend
 from .. import backend as T
 from ..base import fold, unfold
 from ..base import partial_fold, partial_unfold
 from ..base import tensor_to_vec, vec_to_tensor
 from ..base import partial_tensor_to_vec, partial_vec_to_tensor
 from ..testing import (assert_array_equal, assert_equal, assert_,
-                              assert_array_almost_equal, assert_raises)
+                       assert_array_almost_equal, assert_raises)
 
 # Author: Jean Kossaifi
 
@@ -381,21 +380,22 @@ def test_svd():
 
             # True reconstruction error (based on numpy SVD)
             true_rec_error = np.sum((matrix - np.dot(U, S.reshape((-1, 1))*V))**2)
+
             # Reconstruction error with the backend's SVD
             rec_error = T.sum((matrix_backend - T.dot(fU, T.reshape(fS, (-1, 1))*fV))**2)
             # Check that the two are similar
-            assert_(true_rec_error - rec_error <= tol,
+            assert_(T.to_numpy(true_rec_error - rec_error) <= tol,
                 msg='Reconstruction not correct for "{}" svd fun VS svd and backend="{}, for {} eigenenvecs, and size {}".'.format(
                         name, tl.get_backend(), n, s))
 
             # Check for orthogonality when relevant
             if name != 'symeig_svd':
                 left_orthogonality_error = T.norm(T.dot(T.transpose(fU), fU) - T.eye(n))
-                assert_(left_orthogonality_error <= tol_orthogonality,
+                assert_(T.to_numpy(left_orthogonality_error) <= tol_orthogonality,
                     msg='Left eigenvecs not orthogonal for "{}" svd fun VS svd and backend="{}, for {} eigenenvecs, and size {}".'.format(
                             name, tl.get_backend(), n, s))
                 right_orthogonality_error = T.norm(T.dot(T.transpose(fU), fU) - T.eye(n))
-                assert_(right_orthogonality_error <= tol_orthogonality,
+                assert_(T.to_numpy(right_orthogonality_error) <= tol_orthogonality,
                     msg='Right eigenvecs not orthogonal for "{}" svd fun VS svd and backend="{}, for {} eigenenvecs, and size {}".'.format(
                         name, tl.get_backend(), n, s))
 
