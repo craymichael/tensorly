@@ -101,11 +101,7 @@ class TensorflowBackend(Backend):
         
     @staticmethod
     def conj(x, *args, **kwargs):
-        """WARNING: IDENTITY FUNCTION (does nothing)
-
-            This backend currently does not support complex tensors
-        """
-        return x
+        return tf.conj(x)
 
     @staticmethod
     def solve(lhs, rhs):
@@ -161,10 +157,10 @@ class TensorflowBackend(Backend):
 
 _FUN_NAMES = [
     # source_fun, target_fun
-    (np.int32, 'int32'),
-    (np.int64, 'int64'),
-    (np.float32, 'float32'),
-    (np.float64, 'float64'),
+    (tf.int32, 'int32'),
+    (tf.int64, 'int64'),
+    (tf.float32, 'float32'),
+    (tf.float64, 'float64'),
     (tf.ones, 'ones'),
     (tf.zeros, 'zeros'),
     (tf.zeros_like, 'zeros_like'),
