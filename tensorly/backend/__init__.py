@@ -12,6 +12,7 @@ _KNOWN_BACKENDS = {'numpy': 'NumpyBackend',
                    'mxnet':'MxnetBackend', 
                    'pytorch':'PyTorchBackend', 
                    'tensorflow':'TensorflowBackend',
+                   'tensorflow_graph':'TensorflowGraphBackend',
                    'cupy':'CupyBackend'}
 
 _LOADED_BACKENDS = {}
