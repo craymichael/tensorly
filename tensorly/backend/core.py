@@ -251,6 +251,17 @@ class Backend(object):
         raise NotImplementedError
 
     @staticmethod
+    def diag(diagnoal):
+        """Return a 2-D tensor with the elements of `diagonal` on the diagonal and zeros elsewhere.
+
+        Parameters
+        ----------
+        diagonal : 1-D tensor
+            diagonnal elements of the 2-D tensor to construct.
+        """
+        raise NotImplementedError
+
+    @staticmethod
     def eye(N):
         """Return a 2-D tensor with ones on the diagonal and zeros elsewhere.
 
@@ -542,6 +553,12 @@ class Backend(object):
         """
         raise NotImplementedError
     
+    def eps(self, dtype):
+        return self.finfo(dtype).eps
+    
+    def finfo(self, dtype):
+        return np.finfo(self.to_numpy(self.tensor([], dtype=dtype)).dtype)
+
     @staticmethod
     def conj(x, *args, **kwargs):
         """Return the complex conjugate, element-wise.
