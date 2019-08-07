@@ -58,7 +58,7 @@ def partial_tucker(tensor, modes, rank=None, n_iter_max=100, init='svd', tol=10e
         warnings.warn(message, Warning)
         rank = [tl.shape(tensor)[mode] for mode in modes]
     elif isinstance(rank, int):
-        message = "Given only one int for 'rank' intead of a list of {} modes. " \
+        message = "Given only one int for 'rank' instead of a list of {} modes. " \
                   "Using this rank for all modes.".format(len(modes))
         warnings.warn(message, Warning)
         rank = [rank for _ in modes]
@@ -146,7 +146,6 @@ def partial_tucker(tensor, modes, rank=None, n_iter_max=100, init='svd', tol=10e
             loop_vars=[tf.constant(0), dummy_core, dummy_err_prev,
                        dummy_err_curr, *factors]
         )
-        return core, factors
 
     else:
         rec_errors = []

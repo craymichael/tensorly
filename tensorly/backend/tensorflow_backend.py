@@ -101,7 +101,7 @@ class TensorflowBackend(Backend):
         
     @staticmethod
     def conj(x, *args, **kwargs):
-        return tf.conj(x)
+        return tf.math.conj(x)
 
     @staticmethod
     def solve(lhs, rhs):
@@ -146,7 +146,7 @@ class TensorflowBackend(Backend):
         else:
             full_matrices = False
 
-        S, U, V = tf.svd(matrix, full_matrices=full_matrices)
+        S, U, V = tf.linalg.svd(matrix, full_matrices=full_matrices)
         U, S, V = U[:, :n_eigenvecs], S[:n_eigenvecs], tf.transpose(V)[:n_eigenvecs, :]
         return U, S, V
 
@@ -171,7 +171,7 @@ _FUN_NAMES = [
     (tf.sign, 'sign'),
     (tf.abs, 'abs'),
     (tf.sqrt, 'sqrt'),
-    (tf.qr, 'qr'),
+    (tf.linalg.qr, 'qr'),
     (tf.argmin, 'argmin'),
     (tf.argmax, 'argmax'),
     (tf.stack, 'stack'),
