@@ -136,20 +136,8 @@ def partial_tucker(tensor, modes, rank=None, n_iter_max=100, init='svd',
 
         def body(dparams, core, *factors):  # While loop body
             factors = list(factors)
-            for index, mode in enumerate(modes):
-                core_approximation = multi_mode_dot(tensor, factors,
-                                                    modes=modes,
-                                                    skip=index, transpose=True)
-                eigenvecs, _, _ = svd_fun(unfold(core_approximation, mode),
-                                          n_eigenvecs=rank[index])
-                factors[index] = eigenvecs
-            core = multi_mode_dot(tensor, factors, modes=modes, transpose=True)
-
-            # The factors are orthonormal and therefore do not affect the
-            # reconstructed tensor's norm
-
-            rec_error_curr = tl.sqrt(
-                tl.abs(norm_tensor ** 2 - tl.norm(core, 2) ** 2)) / norm_tensor
+            core = _common_snippet_1(tensor, modes, factors, rank, svd_fun)
+            rec_error_curr = _common_snippet_2(core, norm_tensor)
 
             dparams = dparams._replace(
                 variation=dparams.error - rec_error_curr,
@@ -189,22 +177,9 @@ def partial_tucker(tensor, modes, rank=None, n_iter_max=100, init='svd',
         rec_error_curr = float('+inf')
 
         for iteration in range(n_iter_max):
-            for index, mode in enumerate(modes):
-                core_approximation = multi_mode_dot(tensor, factors,
-                                                    modes=modes,
-                                                    skip=index, transpose=True)
-                eigenvecs, _, _ = svd_fun(unfold(core_approximation, mode),
-                                          n_eigenvecs=rank[index])
-                factors[index] = eigenvecs
-
-            core = multi_mode_dot(tensor, factors, modes=modes, transpose=True)
-
-            # The factors are orthonormal and therefore do not affect the
-            # reconstructed tensor's norm
-
+            core = _common_snippet_1(tensor, modes, factors, rank, svd_fun)
             rec_error_prev = rec_error_curr
-            rec_error_curr = tl.sqrt(
-                tl.abs(norm_tensor ** 2 - tl.norm(core, 2) ** 2)) / norm_tensor
+            rec_error_curr = _common_snippet_2(core, norm_tensor)
 
             if iteration > 1:
                 if verbose:
@@ -217,6 +192,29 @@ def partial_tucker(tensor, modes, rank=None, n_iter_max=100, init='svd',
                     break
 
     return core, factors
+
+
+# /====== COMMON FUNCTIONS ======\
+# TODO(obvious reasons)
+def _common_snippet_1(tensor, modes, factors, rank, svd_fun):
+    for index, mode in enumerate(modes):
+        core_approximation = multi_mode_dot(tensor, factors,
+                                            modes=modes,
+                                            skip=index, transpose=True)
+        eigenvecs, _, _ = svd_fun(unfold(core_approximation, mode),
+                                  n_eigenvecs=rank[index])
+        factors[index] = eigenvecs
+    core = multi_mode_dot(tensor, factors, modes=modes, transpose=True)
+    return core
+
+
+def _common_snippet_2(core, norm_tensor):
+    # The factors are orthonormal and therefore do not affect the
+    # reconstructed tensor's norm
+    return tl.sqrt(
+        tl.abs(norm_tensor ** 2 - tl.norm(core, 2) ** 2)
+    ) / norm_tensor
+# \====== COMMON FUNCTIONS ======/
 
 
 def tucker(tensor, rank=None, ranks=None, n_iter_max=100, init='svd',
