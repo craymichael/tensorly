@@ -11,6 +11,7 @@ import numpy as np
 from . import Backend
 # EagerTensor
 from tensorflow.python.framework.ops import EagerTensor
+
 # Get tf.py_function (older versions have it as py_func)
 tf_py_func = getattr(tf, 'py_function', getattr(tf, 'py_func'))
 
@@ -84,11 +85,13 @@ class TensorflowGraphBackend(Backend):
             return tensor
         elif isinstance(tensor, EagerTensor):
             return tensor.numpy()
-        elif isinstance(tensor, (tuple, list)) and isinstance(tensor[0], EagerTensor):
+        elif isinstance(tensor, (tuple, list)) and isinstance(tensor[0],
+                                                              EagerTensor):
             # If list, assume list of EagerTensors
             return [t.numpy() for t in tensor]
         elif (self.is_tensor(tensor) or
-              (isinstance(tensor, (tuple, list)) and self.is_tensor(tensor[0]))):
+              (isinstance(tensor, (tuple, list)) and self.is_tensor(
+                  tensor[0]))):
             # If list, assume list of tensors.
             # Initialize variables if needed.
             uninit_vars = self.session.run(tf.report_uninitialized_variables())
@@ -129,7 +132,8 @@ class TensorflowGraphBackend(Backend):
         else:
             a_max = tf.reduce_max(tensor_)
 
-        return tf.clip_by_value(tensor_, clip_value_min=a_min, clip_value_max=a_max)
+        return tf.clip_by_value(tensor_, clip_value_min=a_min,
+                                clip_value_max=a_max)
 
     def moveaxis(self, tensor, source, target):
         axes = list(range(self.ndim(tensor)))
@@ -143,8 +147,9 @@ class TensorflowGraphBackend(Backend):
         try:
             axes.insert(target, source)
         except IndexError:
-            raise ValueError('Destination should verify 0 <= destination < tensor.ndim'
-                             'Got %d' % target)
+            raise ValueError(
+                'Destination should verify 0 <= destination < tensor.ndim'
+                'Got %d' % target)
         return tf.transpose(tensor, axes)
 
     @staticmethod
@@ -156,7 +161,8 @@ class TensorflowGraphBackend(Backend):
         return res
 
     def dot(self, tensor1, tensor2):
-        return tf.tensordot(tensor1, tensor2, axes=([self.ndim(tensor1) - 1], [0]))
+        return tf.tensordot(tensor1, tensor2,
+                            axes=([self.ndim(tensor1) - 1], [0]))
 
     @staticmethod
     def conj(x, *args, **kwargs):
@@ -194,6 +200,7 @@ class TensorflowGraphBackend(Backend):
         V : 2-D tensor, shape (n_eigenvecs, matrix.shape[1])
             Contains the left singular vectors
         """
+
         def svd_func(matrix_):
             return super(TensorflowGraphBackend,
                          self).partial_svd(matrix_, n_eigenvecs)
@@ -248,13 +255,15 @@ class TensorflowGraphBackend(Backend):
             full_matrices = False
 
         S, U, V = tf.linalg.svd(matrix, full_matrices=full_matrices)
-        U, S, V = U[:, :n_eigenvecs], S[:n_eigenvecs], tf.transpose(V)[:n_eigenvecs, :]
+        U, S, V = U[:, :n_eigenvecs], S[:n_eigenvecs], tf.transpose(V)[
+                                                       :n_eigenvecs, :]
         return U, S, V
 
     @property
     def SVD_FUNS(self):
         return {'numpy_svd': self.partial_svd,
                 'truncated_svd': self.truncated_svd}
+
 
 _FUN_NAMES = [
     # source_fun, target_fun
@@ -264,6 +273,7 @@ _FUN_NAMES = [
     (tf.float64, 'float64'),
     (tf.ones, 'ones'),
     (tf.zeros, 'zeros'),
+    (tf.diag, 'diag'),
     (tf.zeros_like, 'zeros_like'),
     (tf.eye, 'eye'),
     (tf.reshape, 'reshape'),
@@ -273,6 +283,7 @@ _FUN_NAMES = [
     (tf.abs, 'abs'),
     (tf.sqrt, 'sqrt'),
     (tf.linalg.qr, 'qr'),
+    # (tf.linalg.solve, 'solve'),
     (tf.argmin, 'argmin'),
     (tf.argmax, 'argmax'),
     (tf.stack, 'stack'),
@@ -285,8 +296,7 @@ _FUN_NAMES = [
     (tf.reduce_sum, 'sum'),
     (tf.reduce_prod, 'prod'),
     (tf.reduce_all, 'all'),
-    ]
+]
 for source_fun, target_fun_name in _FUN_NAMES:
     TensorflowGraphBackend.register_method(target_fun_name, source_fun)
 del _FUN_NAMES
-

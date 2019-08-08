@@ -17,8 +17,8 @@ def test_partial_tucker():
         if tl.get_backend() == 'tensorflow_graph' and svd_func == 'numpy_svd':
             continue  # TODO(craymichael)
 
-        core, factors = partial_tucker(tensor, modes, rank=None, n_iter_max=200, svd=svd_func,
-                                       verbose=True)
+        core, factors = partial_tucker(tensor, modes, rank=None, n_iter_max=200,
+                                       svd=svd_func, verbose=True)
         reconstructed_tensor = multi_mode_dot(core, factors, modes=modes)
         norm_rec = tl.to_numpy(tl.norm(reconstructed_tensor, 2))
         norm_tensor = tl.to_numpy(tl.norm(tensor, 2))

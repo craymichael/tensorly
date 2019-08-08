@@ -94,15 +94,9 @@ def _validate_kruskal_tensor(kruskal_tensor):
                                  rank, i, T.shape(factor)[1]))
         shape.append(current_mode_size)
 
-    weight_len = T.shape(weights)[0]
-    if weight_len is None:
-        # TensorflowGraph backend only - placeholders will have unknown shapes
-        # at this place, warn the user that the Tensor cannot be validated
-        warnings.warn('weights has an unknown size at index 0 of its shape: '
-                      'cannot validate Kruskal tensor')
-    elif weights is not None and weight_len != rank:
-        raise ValueError('Given factors for a rank-{} Kruskal tensor but len(weights)={}.'.format(
-            rank, weight_len))
+    if weights is not None and T.shape(weights)[0] != rank:
+        raise ValueError('Given factors for a rank-{} Kruskal tensor but '
+                         'len(weights)={}.'.format(rank, T.shape(weights)[0]))
         
     return tuple(shape), rank
 
@@ -425,6 +419,6 @@ def kruskal_norm(kruskal_tensor):
         #norm = T.dot(T.dot(weights, norm), weights)
         norm = norm * (T.reshape(weights, (-1, 1))*T.reshape(weights, (1, -1)))
 
-    # We sum even if weigths is not None
+    # We sum even if weights is not None
     # as e.g. MXNet would return a 1D tensor, not a 0D tensor
     return T.sqrt(T.sum(norm))
